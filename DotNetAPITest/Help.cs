@@ -7,9 +7,8 @@ namespace DotNetAPITest
        public static void ShowHelp()
        {
            Console.WriteLine("");
-           Console.WriteLine("DESCRIPTION:\tExercise RIC Desktop's .NET API");
-           Console.WriteLine("");
-           Console.WriteLine("USAGE:\t\tDotNetAPITest [<OptionSpec> ...], where:");
+           Console.WriteLine(" DESCRIPTION:\tExercise RIC Desktop's .NET API");
+           Console.WriteLine(" USAGE:\t\tDotNetAPITest [<OptionSpec> ...], where:");
            Console.WriteLine("");
            Console.WriteLine("\t\tOptionSpec\t- <Flag><Option>[<Separator><Param>]");
            Console.WriteLine("\t\tFlag\t\t- <'-' | '/'>");
@@ -29,9 +28,8 @@ namespace DotNetAPITest
        public static void EmulationOption()
        {
            Console.WriteLine("");
-           Console.WriteLine("DESCRIPTION:\tFor a specified emulation type, run tests, display type-specific help, etc.");
-           Console.WriteLine("");
-           Console.WriteLine("USAGE:\t\tDotNetAPITest -e <Type> [<EmuOptionSpec> ... | -emuhelp [<EmuOption]], where:");
+           Console.WriteLine(" DESCRIPTION:\tFor a specified emulation type, run tests, display type-specific help, etc.");
+           Console.WriteLine(" USAGE:\t\tDotNetAPITest -e <Type> [<EmuOptionSpec> ... | -emuhelp [<EmuOption]], where:");
            Console.WriteLine("");
            Console.WriteLine("\t\t<Type>\t\t\t- One of ALC, T27, UTS, IBM, VT");
            Console.WriteLine("\t\t\t\t\t  With neither <EmuOptionSpec>[s] nor -emuhelp");

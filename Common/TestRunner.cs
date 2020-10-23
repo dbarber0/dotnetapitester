@@ -19,6 +19,8 @@ namespace Common
         protected readonly Dictionary<string, OptionDescriptor> _parsers;
         protected readonly Dictionary<string, TestDelegate> _tests;
 
+        protected readonly Dictionary<string, Type> _tests1;
+
         protected int _optionCount;
 
         protected OptionHelp _help;
@@ -29,15 +31,20 @@ namespace Common
         protected string _testName;
         protected string _emulationType;
 
-        protected delegate void TestDelegate();
         protected TestDelegate _testMethod;
+        protected TestDelegate1 _testMethod1;
 
-        #region ITest
+        protected Type _testType;
+        protected Type _testHelp;
+
+        protected string[] _params;
+
+        #region IRun
 
         public void Run(string[] Params)
         {
             ICLParser clparser = new Parser(_parsers);
-            clparser.ParseCommandLine(Params);
+            _params = clparser.ParseCommandLine(Params);
 
             if (HelpRequested())
             {
@@ -59,7 +66,7 @@ namespace Common
             }
         }
 
-        #endregion ITest
+        #endregion IRun
 
         #region Construction
 
@@ -67,6 +74,8 @@ namespace Common
         {
             _parsers = new Dictionary<string, OptionDescriptor>();
             _tests = new Dictionary<string, TestDelegate>();
+            _tests1 = new Dictionary<string, Type>();
+
             OptionDescriptor od = new OptionDescriptor(DetailedHelpParser, ShowHelp);
             _parsers.Add("emuhelp", od);
 
@@ -148,18 +157,25 @@ namespace Common
 
         #region Helpers
 
-        private void VerifyTestParameter()
+        protected void VerifyTestParameter()
         {
             if (string.IsNullOrEmpty(_testName))
             {
                 throw new Exception("No test parameter specified");
             }
+            /*
             if (!_tests.TryGetValue(_testName, out _testMethod))
+            {
+                throw new Exception($"Unknown test {_testName}");
+            }
+            */
+            if (!_tests1.TryGetValue(_testName, out _testType))
             {
                 throw new Exception($"Unknown test {_testName}");
             }
 
         }
+
         private void VerifySessionParameter()
         {
             if (string.IsNullOrEmpty(_session))
@@ -235,7 +251,8 @@ namespace Common
             }
             if (!_connected)
             {
-                throw new Exception("Failed to Connect.");
+                //throw new Exception("Failed to Connect.");
+                Console.WriteLine("Failed to Connect.");
             }
         }
 
@@ -277,7 +294,13 @@ namespace Common
             Console.WriteLine("");
             Console.WriteLine($" Available tests for emulation type {_emulationType}:");
             Console.WriteLine("");
+            /*
             foreach (var test in _tests)
+            {
+                Console.WriteLine($"\t{test.Key}");
+            }
+            */
+            foreach (var test in _tests1)
             {
                 Console.WriteLine($"\t{test.Key}");
             }
@@ -339,15 +362,20 @@ namespace Common
                 return null;
             }
 
-            _help = ShowHelp;
-            if (_parsers.ContainsKey(Param))
+            string temp = Param.ToUpper();
+            if (_parsers.ContainsKey(temp))
             {
-                _parsers.TryGetValue(Param, out OptionDescriptor od);
+                _parsers.TryGetValue(temp, out OptionDescriptor od);
                 _help = od?.Help;
+            }
+            else if (_tests1.ContainsKey(temp))
+            {
+                _tests1.TryGetValue(temp, out _testHelp);
             }
             else
             {
                 Console.WriteLine($"No Help found for option {Param}");
+                _help = ShowHelp;
             }
 
             _optionCount++;
@@ -458,76 +486,19 @@ namespace Common
                 _help();
                 return true;
             }
+
+            if (_testHelp != null && _optionCount == 1)
+            {
+                Test o = (Test)Activator.CreateInstance(_testHelp);
+                o.Help();
+                return true;
+            }
             return false;
         }
 
         #endregion Help
 
         #region DeleteMe
-
-        /*
-        public void Run(string[] Params)
-        {
-            ICLParser clparser = new Parser(_parsers);
-            clparser.ParseCommandLine(Params);
-
-            if (DisplayHelp())
-            {
-                return;
-            }
-
-            try
-            {
-                if (!VerifySessionName())
-                {
-                    return;
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                return;
-            }
-
-            if (string.IsNullOrEmpty(_testName))
-            {
-                Console.WriteLine("No test specified");
-                ShowHelp();
-                return;
-            }
-            if (!_tests.TryGetValue(_testName, out _testMethod))
-            {
-                throw new Exception($"Unknown test {_testName}");
-            }
-
-            GetAppObject();
-            GetFrameObject();
-
-            RunInternal();
-        }
-
-        protected bool CreateControl(out object Control, Type T)
-        {
-            object[] controls = _app.GetControlsByFilePath(_session);
-            if (controls.Length != 0)
-            {
-                Control = controls[0];
-                Type[] ta = Control.GetType().GetInterfaces();
-                foreach (Type t in ta)
-                {
-                    if (t == T)
-                    {
-                        Console.WriteLine("Types match");
-                        return false;
-                    }
-                }
-
-                throw new Exception($"CreateControl: control is not of type {T}");
-            }
-            Control = _app.CreateControl(_session);
-            return true;
-        }
-        */
 
         #endregion
 

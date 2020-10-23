@@ -18,10 +18,15 @@ namespace VTTests
 
             _emulationType = "VT";
 
-            _tests.Add("TLSGetSetVersion".ToUpper(), TLSGetSetVersion);
-            _tests.Add("GetColorRGB".ToUpper(), GetColorRGB);
-            _tests.Add("SetColorRGB".ToUpper(), SetColorRGB);
-            _tests.Add("SetHostName".ToUpper(), SetHostName);
+            //_tests.Add("TLSGetSetVersion".ToUpper(), TLSGetSetVersion);
+            //_tests.Add("GetColorRGB".ToUpper(), GetColorRGB);
+            //_tests.Add("SetColorRGB".ToUpper(), SetColorRGB);
+            //_tests.Add("SetHostName".ToUpper(), SetHostName);
+
+            _tests1.Add("SetHostName".ToUpper(), typeof(SetHostNameTest));
+            _tests1.Add("AutoConnectProperty".ToUpper(), typeof(AutoConnectPropertyTest));
+            _tests1.Add("LineDelayProperty".ToUpper(), typeof(LineDelayTest));
+            _tests1.Add("TimeoutProperty".ToUpper(), typeof(TimeoutTest));
         }
 
         #region ITest
@@ -48,7 +53,8 @@ namespace VTTests
             _screen = _terminal.Screen;
 
             //  Call specific test
-            _testMethod();
+            //_testMethod();
+            RunTest();
         }
 
         #endregion ITest
@@ -145,6 +151,19 @@ namespace VTTests
             //((IConnectionSettingsTelnet)_terminal.ConnectionSettings).HostAddress = "sylvester";
             ((IConnectionSettingsTelnet)_terminal.ConnectionSettings).HostAddress = "kona";
             _terminal.Connect();
+        }
+
+        void DAB()
+        {
+            var sa = new []{"bob", "dab"};
+            Test o = (Test)Activator.CreateInstance(typeof(SetHostNameTest), new object[] {_terminal, _screen});
+            o.Run(sa);
+        }
+
+        protected void RunTest()
+        {
+            Test o = (Test)Activator.CreateInstance(_testType, new object[] { _terminal, _emulationType });
+            o.Run(_params);
         }
 
         #region Help

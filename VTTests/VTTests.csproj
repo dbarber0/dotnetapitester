@@ -43,11 +43,20 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files (x86)\Micro Focus\InfoConnect\Programmer Interfaces\Attachmate.Reflection.Framework.dll</HintPath>
     </Reference>
+    <Reference Include="clparser, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\output\debug\clparser.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutoConnectPropertyTest.cs" />
+    <Compile Include="LineDelayTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SetHostNameTest.cs" />
+    <Compile Include="TimeoutTest.cs" />
+    <Compile Include="VTTest.cs" />
     <Compile Include="VTTestRunner.cs" />
   </ItemGroup>
   <ItemGroup>

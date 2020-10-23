@@ -5,13 +5,14 @@ using CLParser;
 using T27Tests;
 using UTSTests;
 
+using System.Linq;
+
 using Common;
 using IBMTests;
 using VTTests;
 
 namespace DotNetAPITest
 {
-    delegate IRun TestRunnerFactory();
 
     public class App : IRun
     {
@@ -21,9 +22,8 @@ namespace DotNetAPITest
         private readonly Dictionary<string, OptionDescriptor> _parsers;
         private int _optionCount;
         private OptionHelp _help;
-        private TestRunnerFactory _factory;
+        protected readonly Dictionary<string, Type> _testRunnerFactories1;
 
-        private readonly Dictionary<string, TestRunnerFactory> _testRunnerFactories;
 
         #region Construction
 
@@ -40,53 +40,15 @@ namespace DotNetAPITest
             od = new OptionDescriptor(EmulationParser, HelpOnOption_Emulation);
             _parsers.Add("e", od);
 
-            _testRunnerFactories = new Dictionary<string, TestRunnerFactory>();
-            _testRunnerFactories.Add("ALC", ALCTestRunnerFactory);
-            _testRunnerFactories.Add("T27", T27TestRunnerFactory);
-            _testRunnerFactories.Add("UTS", UTSTestRunnerFactory);
-            _testRunnerFactories.Add("IBM", IBMTestRunnerFactory);
-            _testRunnerFactories.Add("VT", VTTestRunnerFactory);
+            _testRunnerFactories1 = new Dictionary<string, Type>();
+            _testRunnerFactories1.Add("IBM", typeof(IBMTestRunner));
+            _testRunnerFactories1.Add("VT", typeof(VTTestRunner));
+            _testRunnerFactories1.Add("ALC", typeof(ALCTestRunner));
+            _testRunnerFactories1.Add("T27", typeof(T27TestRunner));
+            _testRunnerFactories1.Add("UTS", typeof(UTSTestRunner));
         }
 
         #endregion Construction
-
-        #region Factories
-
-        IRun ALCTestRunnerFactory()
-        {
-            return new ALCTestRunner();
-        }
-
-        IRun T27TestRunnerFactory()
-        {
-            return new T27TestRunner();
-        }
-
-        IRun UTSTestRunnerFactory()
-        {
-            return new UTSTestRunner();
-        }
-
-        IRun IBMTestRunnerFactory()
-        {
-            return new IBMTestRunner();
-        }
-
-        IRun VTTestRunnerFactory()
-        {
-            return new VTTestRunner();
-        }
-
-        private void GetTestRunnerFactory()
-        {
-            if (!_testRunnerFactories.TryGetValue(_emulationType, out _factory))
-            {
-                throw new Exception($"Unknown emulation type: {_emulationType}");
-            }
-
-        }
-
-        #endregion Factories
 
         #region IApp
 
@@ -101,12 +63,14 @@ namespace DotNetAPITest
                 return;
             }
 
-            if (!_testRunnerFactories.TryGetValue(_emulationType, out _factory))
+            Type factory;
+            if (!_testRunnerFactories1.TryGetValue(_emulationType, out factory))
             {
                 Console.WriteLine($"Unknown emulation type: {_emulationType}");
                 return;
             }
-            _factory().Run(unprocessedParams);
+            TestRunner o = (TestRunner)Activator.CreateInstance(factory);
+            o.Run(unprocessedParams);
         }
 
         #endregion IApp
@@ -116,6 +80,24 @@ namespace DotNetAPITest
         OptionParser BasicHelpParser(string Param)
         {
             _help = ShowHelp;
+            _optionCount++;
+            return null;
+        }
+
+        OptionParser EmulationParser(string Param)
+        {
+            if (string.IsNullOrEmpty(Param))
+            {
+                if (Param != null)
+                {
+                    return EmulationParser;
+                }
+
+                Console.WriteLine("EmulationTypeParser - Expected value");
+                return null;
+            }
+
+            _emulationType = Param.ToUpper();
             _optionCount++;
             return null;
         }
@@ -145,24 +127,6 @@ namespace DotNetAPITest
                 _help = ShowHelp;
             }
 
-            _optionCount++;
-            return null;
-        }
-
-        OptionParser EmulationParser(string Param)
-        {
-            if (string.IsNullOrEmpty(Param))
-            {
-                if (Param != null)
-                {
-                    return EmulationParser;
-                }
-
-                Console.WriteLine("EmulationTypeParser - Expected value");
-                return null;
-            }
-
-            _emulationType = Param.ToUpper();
             _optionCount++;
             return null;
         }
@@ -201,26 +165,6 @@ namespace DotNetAPITest
         #region DeleteMe
 
         /*
-        public void Run0()
-        {
-            ICLParser clparser = new Parser(_parsers);
-            string[] unprocessedParams = clparser.ParseCommandLine(_params);
-
-            if (DisplayHelp())
-            {
-                return;
-            }
-
-            try
-            {
-                GetTestRunnerFactory();
-                _factory().Run(unprocessedParams);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-        }
         */
 
         #endregion
