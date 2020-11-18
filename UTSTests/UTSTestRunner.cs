@@ -15,10 +15,9 @@ namespace UTSTests
 
         public UTSTestRunner()
         {
-            _session = @"D:\users\dab\documents\Micro Focus\Sessions\int1-0.iuts";
             _emulationType = "UTS";
 
-            _tests.Add("US199046".ToUpper(), US199046);
+            _tests.Add("AutoCopyOnSelect".ToUpper(), typeof(AutoCopyOnSelectTest));
         }
 
         #region ITest
@@ -29,12 +28,7 @@ namespace UTSTests
             _terminal = (IUtsTerminal)_control;
             _terminal.AfterConnect += TerminalAfterConnect;
 
-            IView sessionView = CreateView(newControl, _terminal);
-            if (sessionView == null)
-            {
-                throw new Exception("Failed to create the view.");
-            }
-
+            _view = CreateView(newControl, _terminal);
             if (!_terminal.IsConnected)
             {
                 Console.WriteLine("Terminal not connected - call Connect()");
@@ -46,11 +40,16 @@ namespace UTSTests
             _screen.MouseClick += MouseClickHandler;
 
             //  Call specific test
-
-            _testMethod();
+            RunTest();
         }
 
         #endregion ITest
+
+        protected void RunTest()
+        {
+            Test o = (Test)Activator.CreateInstance(_testType, new object[] { _terminal, _emulationType });
+            o.Run(Commands.Run, _unprocessedParams);
+        }
 
         protected void MouseClickHandler(object sender, MouseEventArgsEx args)
         {
@@ -67,18 +66,6 @@ namespace UTSTests
             _screen.PutText(Data, Row, Column);
         }
 
-        protected override int CursorRow
-        {
-            get { return _screen.CursorRow; }
-            set { _screen.CursorRow = value; }
-        }
-
-        protected override int CursorColumn
-        {
-            get { return _screen.CursorColumn; }
-            set { _screen.CursorColumn = value; }
-        }
-
         protected override int Rows
         {
             get { return _screen.Rows; }
@@ -92,14 +79,7 @@ namespace UTSTests
         void US199046()
         {
             Console.WriteLine("UTS");
-            var temp = _screen.AutoCopyOnSelect;
-            Console.WriteLine("AutoCopyOnSelect = {0}", temp);
-            _screen.AutoCopyOnSelect = !temp;
-            Console.WriteLine("AutoCopyOnSelect = {0}", _screen.AutoCopyOnSelect);
-            _screen.AutoCopyOnSelect = temp;
-            Console.WriteLine("AutoCopyOnSelect = {0}", _screen.AutoCopyOnSelect);
-
-            temp = _screen.CursorFollowsSelection;
+            var temp = _screen.CursorFollowsSelection;
             Console.WriteLine("\nCursorFollowsSelection = {0}", temp);
             _screen.AutoCopyOnSelect = !temp;
             Console.WriteLine("CursorFollowsSelection = {0}", _screen.AutoCopyOnSelect);
@@ -124,20 +104,7 @@ namespace UTSTests
 
         protected override void ShowHelp()
         {
-            Console.WriteLine("");
-            Console.WriteLine("UTS Basic Help:");
-            Console.WriteLine("");
-            Console.WriteLine("\t Under construction");
-            Console.WriteLine("");
-        }
-
-        protected override void HelpOnOption_Test()
-        {
-            Console.WriteLine("");
-            Console.WriteLine("UTS Run Test Help:");
-            Console.WriteLine("");
-            Console.WriteLine("\t Under construction");
-            Console.WriteLine("");
+            Console.WriteLine("\n UTSTestRunner help");
         }
 
         #endregion Help

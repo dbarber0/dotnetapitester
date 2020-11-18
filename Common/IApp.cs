@@ -1,6 +1,6 @@
 ﻿namespace Common
 {
-    public interface IRun
+    public interface IApp
     {
         void Run(string[] Params);
     }

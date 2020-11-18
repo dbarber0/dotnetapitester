@@ -12,24 +12,12 @@ namespace VTTests
 
         public VTTestRunner()
         {
-            //_session = @"d:\Users\dab\documents\Micro Focus\Sessions\mermit-dab-ssh.rdox";
-            //_session = @"d:\Users\dab\documents\Micro Focus\InfoConnect\dragontail1.rdox";
-            //_session = @"D:\users\dab\documents\Micro Focus\InfoConnect\18.0\kona.rdox";
-
             _emulationType = "VT";
-
-            //_tests.Add("TLSGetSetVersion".ToUpper(), TLSGetSetVersion);
-            //_tests.Add("GetColorRGB".ToUpper(), GetColorRGB);
-            //_tests.Add("SetColorRGB".ToUpper(), SetColorRGB);
-            //_tests.Add("SetHostName".ToUpper(), SetHostName);
-
-            _tests1.Add("SetHostName".ToUpper(), typeof(SetHostNameTest));
-            _tests1.Add("AutoConnectProperty".ToUpper(), typeof(AutoConnectPropertyTest));
-            _tests1.Add("LineDelayProperty".ToUpper(), typeof(LineDelayTest));
-            _tests1.Add("TimeoutProperty".ToUpper(), typeof(TimeoutTest));
+            _tests.Add("SetHostName".ToUpper(), typeof(SetHostNameTest));
+            _tests.Add("AutoConnectProperty".ToUpper(), typeof(AutoConnectPropertyTest));
+            _tests.Add("LineDelayProperty".ToUpper(), typeof(LineDelayTest));
+            _tests.Add("TimeoutProperty".ToUpper(), typeof(TimeoutTest));
         }
-
-        #region ITest
 
         protected override void RunInternal()
         {
@@ -37,12 +25,7 @@ namespace VTTests
             _terminal = (ITerminal)_control;
             _terminal.Connected += TerminalConnected;
 
-            IView sessionView = CreateView(newControl, _terminal);
-            if (sessionView == null)
-            {
-                throw new Exception("Failed to create the view.");
-            }
-
+            _view = CreateView(newControl, _terminal);
             if (!_terminal.IsConnected)
             {
                 Console.WriteLine("Terminal isn't connected - connecting");
@@ -53,11 +36,8 @@ namespace VTTests
             _screen = _terminal.Screen;
 
             //  Call specific test
-            //_testMethod();
             RunTest();
         }
-
-        #endregion ITest
 
         protected void TLSGetSetVersion()
         {
@@ -142,51 +122,20 @@ namespace VTTests
             */
         }
 
-        void SetHostName()
-        {
-            if (_terminal.IsConnected)
-            {
-                _terminal.Disconnect();
-            }
-            //((IConnectionSettingsTelnet)_terminal.ConnectionSettings).HostAddress = "sylvester";
-            ((IConnectionSettingsTelnet)_terminal.ConnectionSettings).HostAddress = "kona";
-            _terminal.Connect();
-        }
-
-        void DAB()
-        {
-            var sa = new []{"bob", "dab"};
-            Test o = (Test)Activator.CreateInstance(typeof(SetHostNameTest), new object[] {_terminal, _screen});
-            o.Run(sa);
-        }
-
         protected void RunTest()
         {
             Test o = (Test)Activator.CreateInstance(_testType, new object[] { _terminal, _emulationType });
-            o.Run(_params);
+            o.Run(Commands.Run, _unprocessedParams);
         }
+
 
         #region Help
 
-        protected override void ShowHelp()
-        {
-            Console.WriteLine("");
-            Console.WriteLine("VT Basic Help:");
-            Console.WriteLine("");
-            Console.WriteLine("\t Under construction");
-            Console.WriteLine("");
-        }
-
-        protected override void HelpOnOption_Test()
-        {
-            Console.WriteLine("");
-            Console.WriteLine("VT Run Test Help:");
-            Console.WriteLine("");
-            Console.WriteLine("\t Under construction");
-            Console.WriteLine("");
-        }
-
         #endregion Help
+
+        #region DeleteMe
+
+        #endregion
 
     }
 }

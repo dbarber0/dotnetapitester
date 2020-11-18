@@ -15,10 +15,10 @@ namespace IBMTests
             _session = @"d:\Users\dab\documents\Micro Focus\Sessions\dallas0.rd3x";
             _emulationType = "IBM";
 
-            _tests.Add("TLSGetSetVersion".ToUpper(), TLSGetSetVersion);
-            _tests.Add("US200197".ToUpper(), US200197);
-            _tests.Add("ScratchPadTest".ToUpper(), ScratchPadTest);
-            _tests.Add("PutText".ToUpper(), PutTextTest);
+            //_tests.Add("TLSGetSetVersion".ToUpper(), TLSGetSetVersion);
+            //_tests.Add("US200197".ToUpper(), US200197);
+            //_tests.Add("ScratchPadTest".ToUpper(), ScratchPadTest);
+            //_tests.Add("PutText".ToUpper(), PutTextTest);
         }
 
         #region ITest
@@ -45,10 +45,17 @@ namespace IBMTests
             _screen = _terminal.Screen;
 
             //  Call specific test
-            _testMethod();
+            //_testMethod();
+            RunTest();
         }
 
         #endregion ITest
+
+        protected void RunTest()
+        {
+            Test o = (Test)Activator.CreateInstance(_testType, new object[] { _terminal, _emulationType });
+            o.Run(Commands.Run, _unprocessedParams);
+        }
 
         protected override void PutText(string Data, int Row, int Column)
         {
@@ -142,6 +149,11 @@ namespace IBMTests
 
         #region Help
 
+        #endregion Help
+
+        #region DeleteMe
+
+        /*
         protected override void ShowHelp()
         {
             Console.WriteLine("");
@@ -159,10 +171,7 @@ namespace IBMTests
             Console.WriteLine("\t Under construction");
             Console.WriteLine("");
         }
-
-        #endregion Help
-
-        #region DeleteMe
+        */
 
         #endregion DeleteMe
 

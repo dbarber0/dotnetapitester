@@ -18,12 +18,7 @@ namespace VTTests
             SetTestName();
         }
 
-        private void SetTestName()
-        {
-            _testName = "LineDelay";
-        }
-
-        public override void Run(string[] Params)
+        protected override void Command_Run(string[] CommandLine)
         {
             Console.WriteLine($"Test '{_testName}' on emulation: {_emulation}");
 
@@ -32,5 +27,21 @@ namespace VTTests
             ((IConnectionSettingsModem)_terminal.ConnectionSettings).LineDelay = t + 55;
             Console.WriteLine($"AutoConnect = {((IConnectionSettingsModem)_terminal.ConnectionSettings).LineDelay}");
         }
+
+        protected override void Command_Help(string[] CommandLine)
+        {
+
+        }
+
+        private void SetTestName()
+        {
+            _testName = "LineDelay";
+        }
+
+        /*
+        public override void Run(string[] Params)
+        {
+        }
+        */
     }
 }

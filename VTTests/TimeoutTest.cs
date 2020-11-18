@@ -10,7 +10,7 @@ namespace VTTests
 
         public TimeoutTest()
         {
-            SetTestName();
+            _testName = "TimeoutTest";
         }
 
         public TimeoutTest(ITerminal Terminal, string Emulation)
@@ -18,19 +18,15 @@ namespace VTTests
             _terminal = Terminal;
             _screen = Terminal.Screen;
             _emulation = Emulation;
-            SetTestName();
+            _testName = "TimeoutTest";
 
             OptionDescriptor od = new OptionDescriptor(TimeoutParser, null);
             _parsers.Add("to", od);
         }
 
-        private void SetTestName()
+        protected override void Command_Run(string[] CommandLine)
         {
-            _testName = "TimeoutTest";
-        }
-
-        public override void Run(string[] Params)
-        {
+            /*
             base.Run(Params);
 
             Console.WriteLine($"Test '{_testName}' on emulation: {_emulation}");
@@ -45,7 +41,19 @@ namespace VTTests
             Console.WriteLine($"Timeout = {((IConnectionSettingsTelnet)_terminal.ConnectionSettings).Timeout}");
 
             _terminal.Connect();
+            */
         }
+
+        protected override void Command_Help(string[] CommandLine)
+        {
+
+        }
+
+        /*
+        public override void Run(string[] Params)
+        {
+        }
+        */
 
         protected OptionParser TimeoutParser(string Param)
         {

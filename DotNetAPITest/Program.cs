@@ -6,7 +6,7 @@ namespace DotNetAPITest
     {
         static void Main(string[] args)
         {
-            IRun app = new App();
+            IApp app = new App();
             app.Run(args);
         }
     }

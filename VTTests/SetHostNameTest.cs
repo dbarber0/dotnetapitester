@@ -25,15 +25,10 @@ namespace VTTests
 
         }
 
-        private void SetTestName()
-        {
-            _testName = "SetHostName";
-        }
-
-        public override void Run(string[] Params)
+        protected override void Command_Run(string[] CommandLine)
         {
             ICLParser clparser = new Parser(_parsers);
-            clparser.ParseCommandLine(Params);
+            clparser.ParseCommandLine(CommandLine);
 
             Console.WriteLine($"Test '{_testName}' on emulation: {_emulation}\n");
 
@@ -48,9 +43,23 @@ namespace VTTests
                 _terminal.Disconnect();
             }
 
-            ((IConnectionSettingsTelnet) _terminal.ConnectionSettings).HostAddress = _hostName;
+            ((IConnectionSettingsTelnet)_terminal.ConnectionSettings).HostAddress = _hostName;
             _terminal.Connect();
             Console.WriteLine($"Updated Host Name = {((IConnectionSettingsTelnet)_terminal.ConnectionSettings).HostAddress}");
+        }
+
+        protected override void Command_Help(string[] CommandLine)
+        {
+            Console.WriteLine("");
+            Console.WriteLine(" TEST:\t\tSetHostName");
+            Console.WriteLine(" DESCRIPTION:\tUpdate the Host Name connection setting");
+            Console.WriteLine(" USAGE:\t\tDotNetAPITest -e VT -s <SessionFile> -t SETHOSTNAME -hn <NewHostName>");
+            Console.WriteLine("");
+        }
+
+        private void SetTestName()
+        {
+            _testName = "SetHostName";
         }
 
         protected OptionParser HostNameParser(string Param)
@@ -67,15 +76,6 @@ namespace VTTests
             //_session = Param.ToUpper();
             _hostName = Param;
             return null;
-        }
-
-        public override void Help()
-        {
-           Console.WriteLine("");
-           Console.WriteLine(" TEST:\t\tSetHostName");
-           Console.WriteLine(" DESCRIPTION:\tUpdate the Host Name connection setting");
-           Console.WriteLine(" USAGE:\t\tDotNetAPITest -e VT -s <SessionFile> -t SETHOSTNAME -hn <NewHostName>");
-           Console.WriteLine("");
         }
     }
 }

@@ -17,7 +17,7 @@ namespace ALCTests
             _extension = ".ialc";
             _emulationType = "ALC";
 
-            _tests.Add("US199046".ToUpper(), US199046);
+            //_tests.Add("US199046".ToUpper(), US199046);
         }
 
         protected override void RunInternal()
@@ -41,7 +41,14 @@ namespace ALCTests
 
             _screen = _terminal.Screen;
 
-            _testMethod();
+            //_testMethod();
+            RunTest();
+        }
+
+        protected void RunTest()
+        {
+            Test o = (Test)Activator.CreateInstance(_testType, new object[] { _terminal, _emulationType });
+            o.Run(Commands.Run, _unprocessedParams);
         }
 
         protected override void PutText(string Data, int Row, int Column)
@@ -76,13 +83,6 @@ namespace ALCTests
         #endregion Parsers
 
         #region Help
-
-        protected override void ShowHelp()
-        {
-            base.ShowHelp();
-            Console.WriteLine("\t\ts <Session>\t\t- Use session file <Session>");
-            Console.WriteLine("");
-        }
 
         #endregion Help
 
@@ -126,6 +126,16 @@ namespace ALCTests
         #endregion EventHandlers
 
         #region DeleteMe
+
+        /*
+        protected override void ShowHelp()
+        {
+            base.ShowHelp();
+            Console.WriteLine("\t\ts <Session>\t\t- Use session file <Session>");
+            Console.WriteLine("");
+        }
+
+        */
 
         #endregion DeleteMe
     }

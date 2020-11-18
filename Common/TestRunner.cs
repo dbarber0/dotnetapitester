@@ -9,55 +9,60 @@ using Microsoft.Win32;
 
 namespace Common
 {
-    public abstract class TestRunner : IRun
+    public abstract class TestRunner : ICommand
     {
         protected volatile bool _connected;
         protected Application _app;
         protected IFrame _frame;
+        protected IView _view;
+
         protected object _control;
 
         protected readonly Dictionary<string, OptionDescriptor> _parsers;
-        protected readonly Dictionary<string, TestDelegate> _tests;
+        protected readonly Dictionary<Commands, CommandDelegate> _commands;
+        protected readonly Dictionary<string, Type> _tests;
 
-        protected readonly Dictionary<string, Type> _tests1;
-
-        protected int _optionCount;
-
-        protected OptionHelp _help;
-        protected OptionHelp _listTests;
+        //protected OptionHelp _help;
+        //protected OptionHelp _listTests;
 
         protected string _session;
         protected string _extension;
         protected string _testName;
         protected string _emulationType;
 
-        protected TestDelegate _testMethod;
-        protected TestDelegate1 _testMethod1;
-
         protected Type _testType;
-        protected Type _testHelp;
 
-        protected string[] _params;
+        protected string[] _unprocessedParams;
 
-        #region IRun
+        #region Construction
 
-        public void Run(string[] Params)
+        protected TestRunner()
         {
-            ICLParser clparser = new Parser(_parsers);
-            _params = clparser.ParseCommandLine(Params);
+            _parsers = new Dictionary<string, OptionDescriptor>();
+            _tests = new Dictionary<string, Type>();
+            _commands = new Dictionary<Commands, CommandDelegate>();
 
-            if (HelpRequested())
-            {
-                return;
-            }
+            _commands.Add(Commands.Run, Command_Run);
+            _commands.Add(Commands.Help, Command_Help);
 
+            OptionDescriptor od = new OptionDescriptor(SessionFileParser, null);
+            _parsers.Add("s", od);
+
+            od = new OptionDescriptor(RunTestParser, null);
+            _parsers.Add("test", od);
+            _parsers.Add("t", od);
+        }
+
+        #endregion Construction
+
+        protected void Command_Run(string[] Params)
+        {
             try
             {
                 VerifySessionParameter();
                 VerifyTestParameter();
                 GetAppObject();
                 GetFrameObject();
-
                 RunInternal();
             }
             catch (Exception e)
@@ -66,31 +71,50 @@ namespace Common
             }
         }
 
-        #endregion IRun
+        #region ICommand
 
-        #region Construction
-
-        protected TestRunner()
+        public void Run(Commands Command, string[] Params)
         {
-            _parsers = new Dictionary<string, OptionDescriptor>();
-            _tests = new Dictionary<string, TestDelegate>();
-            _tests1 = new Dictionary<string, Type>();
-
-            OptionDescriptor od = new OptionDescriptor(DetailedHelpParser, ShowHelp);
-            _parsers.Add("emuhelp", od);
-
-            od = new OptionDescriptor(SessionFileParser, HelpOnOption_SessionFile);
-            _parsers.Add("s", od);
-
-            od = new OptionDescriptor(TestsParser, HelpOnOption_Tests);
-            _parsers.Add("tests", od);
-
-            od = new OptionDescriptor(RunTestParser, HelpOnOption_Test);
-            _parsers.Add("test", od);
-            _parsers.Add("t", od);
+            try
+            {
+                ICLParser clparser = new Parser(_parsers);
+                _unprocessedParams = clparser.ParseCommandLine(Params);
+                _commands[Command](Params);
+            }
+            catch
+            {
+                Console.WriteLine($"TestRunner: Ooops - no command '{Command}'");
+            }
         }
 
-        #endregion Construction
+        #endregion
+
+        protected void Command_Help(string[] Params)
+        {
+            if (string.IsNullOrEmpty(_testName))
+            {
+                ShowHelp();
+                ListTests();
+            }
+            else
+            {
+                try
+                {
+                    VerifyTestParameter();
+                    Test o = (Test)Activator.CreateInstance(_testType, new object[] { });
+                    o.Run(Commands.Help, _unprocessedParams);
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+        }
+
+        protected virtual void ShowHelp()
+        {
+            Console.WriteLine($"\n Generic Help - consider creating help for {_emulationType}");
+        }
 
         #region DotNetAPI Helpers
 
@@ -150,7 +174,7 @@ namespace Common
             {
                 return views[0];
             }
-            return null;
+            throw new Exception("Failed to create the view.");
         }
 
         #endregion DotNetAPI Helpers
@@ -169,7 +193,7 @@ namespace Common
                 throw new Exception($"Unknown test {_testName}");
             }
             */
-            if (!_tests1.TryGetValue(_testName, out _testType))
+            if (!_tests.TryGetValue(_testName, out _testType))
             {
                 throw new Exception($"Unknown test {_testName}");
             }
@@ -251,8 +275,7 @@ namespace Common
             }
             if (!_connected)
             {
-                //throw new Exception("Failed to Connect.");
-                Console.WriteLine("Failed to Connect.");
+                throw new Exception("Failed to Connect.");
             }
         }
 
@@ -289,18 +312,27 @@ namespace Common
             C = (SP % Columns);
         }
 
+        /*
+        protected void Tests(string[] Params)
+        {
+            Console.WriteLine("");
+            Console.WriteLine($" Available tests for emulation type {_emulationType}:");
+            Console.WriteLine("");
+            foreach (var test in _tests1)
+            {
+                Console.WriteLine($"\t{test.Key}");
+            }
+            Console.WriteLine("");
+        }
+        */
+
         protected void ListTests()
         {
             Console.WriteLine("");
             Console.WriteLine($" Available tests for emulation type {_emulationType}:");
             Console.WriteLine("");
-            /*
+
             foreach (var test in _tests)
-            {
-                Console.WriteLine($"\t{test.Key}");
-            }
-            */
-            foreach (var test in _tests1)
             {
                 Console.WriteLine($"\t{test.Key}");
             }
@@ -337,48 +369,7 @@ namespace Common
 
             //_session = Param.ToUpper();
             _session = Param;
-            _optionCount++;
-            return null;
-        }
-
-        protected OptionParser TestsParser(string Param)
-        {
-            _help = ListTests;
-            _optionCount++;
-            return null;
-        }
-
-        OptionParser DetailedHelpParser(string Param)
-        {
-            if (string.IsNullOrEmpty(Param))
-            {
-                if (Param != null)
-                {
-                    return DetailedHelpParser;
-                }
-
-                _help = ShowHelp;
-                _optionCount++;
-                return null;
-            }
-
-            string temp = Param.ToUpper();
-            if (_parsers.ContainsKey(temp))
-            {
-                _parsers.TryGetValue(temp, out OptionDescriptor od);
-                _help = od?.Help;
-            }
-            else if (_tests1.ContainsKey(temp))
-            {
-                _tests1.TryGetValue(temp, out _testHelp);
-            }
-            else
-            {
-                Console.WriteLine($"No Help found for option {Param}");
-                _help = ShowHelp;
-            }
-
-            _optionCount++;
+            //_optionCount++;
             return null;
         }
 
@@ -395,7 +386,7 @@ namespace Common
             }
 
             _testName = Param.ToUpper();
-            _optionCount++;
+            //_optionCount++;
             return null;
         }
 
@@ -413,6 +404,58 @@ namespace Common
         protected virtual int Columns { get; }
 
         protected abstract void RunInternal();
+
+        #endregion Virtual Methods
+
+        #region Help
+
+        #endregion Help
+
+        #region DeleteMe
+
+        /*
+
+        OptionParser DetailedHelpParser(string Param)
+        {
+            if (string.IsNullOrEmpty(Param))
+            {
+                if (Param != null)
+                {
+                    return DetailedHelpParser;
+                }
+
+                _help = ShowHelp;
+                //_optionCount++;
+                return null;
+            }
+
+            string temp = Param.ToUpper();
+            if (_parsers.ContainsKey(temp))
+            {
+                _parsers.TryGetValue(temp, out OptionDescriptor od);
+                _help = od?.Help;
+            }
+            else if (_tests.ContainsKey(temp))
+            {
+                _tests.TryGetValue(temp, out _testHelp);
+            }
+            else
+            {
+                Console.WriteLine($"No Help found for option {Param}");
+                _help = ShowHelp;
+            }
+
+            //_optionCount++;
+            return null;
+        }
+
+        protected virtual void HelpOnOption_Tests()
+        {
+            Console.WriteLine("");
+            Console.WriteLine($" Description:\tShow the tests available for {_emulationType} emulation");
+            Console.WriteLine("");
+            Console.WriteLine($" Usage:\t\tDotNetAPITest -e {_emulationType} -tests");
+        }
 
         protected virtual void ShowHelp()
         {
@@ -447,10 +490,6 @@ namespace Common
             Console.WriteLine("");
         }
 
-        #endregion Virtual Methods
-
-        #region Help
-
         private void HelpOnOption_SessionFile()
         {
             Console.WriteLine("");
@@ -464,14 +503,6 @@ namespace Common
             Console.WriteLine($"\t\te.g: DotNetAPITest -e {_emulationType} -t SomeTest -s SomeSession{_extension}");
             Console.WriteLine("");
             Console.WriteLine($"\t\t");
-        }
-
-        protected virtual void HelpOnOption_Tests()
-        {
-            Console.WriteLine("");
-            Console.WriteLine($" Description:\tShow the tests available for {_emulationType} emulation");
-            Console.WriteLine("");
-            Console.WriteLine($" Usage:\t\tDotNetAPITest -e {_emulationType} -tests");
         }
 
         protected bool HelpRequested()
@@ -495,10 +526,23 @@ namespace Common
             }
             return false;
         }
+        
+        protected OptionParser TestsParser(string Param)
+        {
+            _help = ListTests;
+            //_optionCount++;
+            return null;
+        }
 
-        #endregion Help
+        protected OptionParser TestsParser(string Param)
+        {
+            _help = ListTests;
+            //_optionCount++;
+            return null;
+        }
 
-        #region DeleteMe
+
+        */
 
         #endregion
 

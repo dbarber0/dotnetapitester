@@ -17,7 +17,7 @@ namespace T27Tests
             _session = "d:\\Users\\dab\\Documents\\Micro Focus\\Sessions\\tcpa-0.it27";
             _emulationType = "T27";
 
-            _tests.Add("PutTextTest".ToUpper(), PutTextTest);
+            //_tests.Add("PutTextTest".ToUpper(), PutTextTest);
         }
 
         #region ITest
@@ -43,10 +43,17 @@ namespace T27Tests
 
             _screen = _terminal.Screen;
 
-            _testMethod();
+            //_testMethod();
+            RunTest();
         }
 
         #endregion ITest
+
+        protected void RunTest()
+        {
+            Test o = (Test)Activator.CreateInstance(_testType, new object[] { _terminal, _emulationType });
+            o.Run(Commands.Run, _unprocessedParams);
+        }
 
         protected void PutTextTest()
         {
@@ -76,6 +83,11 @@ namespace T27Tests
 
         #region Help
 
+        #endregion Help
+
+        #region DeleteMe
+
+        /*
         protected override void ShowHelp()
         {
         Console.WriteLine("");
@@ -93,8 +105,8 @@ namespace T27Tests
             Console.WriteLine("\t Under construction");
             Console.WriteLine("");
         }
+        */
 
-        #endregion Help
-
+        #endregion
     }
 }

@@ -19,14 +19,9 @@ namespace VTTests
             SetTestName();
         }
 
-        private void SetTestName()
+        protected override void Command_Run(string[] CommandLine)
         {
-            _testName = "AutoConnectProperty";
-        }
-
-        public override void Run(string[] Params)
-        {
-            Console.WriteLine($"Test '{_testName}' on emulation: {_emulation}");
+            Console.WriteLine($"\n Test '{_testName}' on emulation: {_emulation}");
 
             bool t = _terminal.AutoConnect;
             Console.WriteLine($"AutoConnect = {t}\n");
@@ -34,5 +29,20 @@ namespace VTTests
             Console.WriteLine($"AutoConnect = {_terminal.AutoConnect}");
         }
 
+        protected override void Command_Help(string[] CommandLine)
+        {
+
+        }
+
+        private void SetTestName()
+        {
+            _testName = "AutoConnectProperty";
+        }
+
+        /*
+        public override void Run(string[] Params)
+        {
+        }
+        */
     }
 }
