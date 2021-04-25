@@ -29,11 +29,6 @@ namespace VTTests
             Console.WriteLine($"AutoConnect = {_terminal.AutoConnect}");
         }
 
-        protected override void Command_Help(string[] CommandLine)
-        {
-
-        }
-
         private void SetTestName()
         {
             _testName = "AutoConnectProperty";

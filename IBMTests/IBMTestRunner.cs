@@ -12,13 +12,9 @@ namespace IBMTests
 
         public IBMTestRunner()
         {
-            _session = @"d:\Users\dab\documents\Micro Focus\Sessions\dallas0.rd3x";
             _emulationType = "IBM";
 
-            //_tests.Add("TLSGetSetVersion".ToUpper(), TLSGetSetVersion);
-            //_tests.Add("US200197".ToUpper(), US200197);
-            //_tests.Add("ScratchPadTest".ToUpper(), ScratchPadTest);
-            //_tests.Add("PutText".ToUpper(), PutTextTest);
+            _tests.Add("BIFFUITest".ToUpper(), typeof(BIFFUITest));
         }
 
         #region ITest
@@ -45,7 +41,6 @@ namespace IBMTests
             _screen = _terminal.Screen;
 
             //  Call specific test
-            //_testMethod();
             RunTest();
         }
 
@@ -54,7 +49,7 @@ namespace IBMTests
         protected void RunTest()
         {
             Test o = (Test)Activator.CreateInstance(_testType, new object[] { _terminal, _emulationType });
-            o.Run(Commands.Run, _unprocessedParams);
+            o.RunCommand(Commands.Run, _unprocessedParams);
         }
 
         protected override void PutText(string Data, int Row, int Column)
@@ -152,26 +147,6 @@ namespace IBMTests
         #endregion Help
 
         #region DeleteMe
-
-        /*
-        protected override void ShowHelp()
-        {
-            Console.WriteLine("");
-            Console.WriteLine("IBM Basic Help:");
-            Console.WriteLine("");
-            Console.WriteLine("\t Under construction");
-            Console.WriteLine("");
-        }
-
-        protected override void HelpOnOption_Test()
-        {
-            Console.WriteLine("");
-            Console.WriteLine("IBM Run Test Help:");
-            Console.WriteLine("");
-            Console.WriteLine("\t Under construction");
-            Console.WriteLine("");
-        }
-        */
 
         #endregion DeleteMe
 

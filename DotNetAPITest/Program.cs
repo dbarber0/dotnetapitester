@@ -4,10 +4,11 @@ namespace DotNetAPITest
 {
     class Program
     {
+        [STAThread]
         static void Main(string[] args)
         {
             IApp app = new App();
-            app.Run(args);
+            app.RunApp(args);
         }
     }
 }

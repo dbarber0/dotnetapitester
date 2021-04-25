@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CLParser;
 
 namespace Common
 {
@@ -7,7 +8,7 @@ namespace Common
     public class CommandDescriptor
     {
         //public delegate void CommandDelegate(List<string> CommandLine);
-        public delegate void CommandHelp();
+        public delegate void CommandHelp(HelpType Type, string Command);
 
         public CommandDescriptor(CommandDelegate Command, CommandHelp Help)
         {
@@ -20,7 +21,7 @@ namespace Common
 
     public interface ICommand
     {
-        void Run(Commands Command, string[] Params);
+        void RunCommand(Commands Command, string[] Params);
     }
 
     public enum Commands

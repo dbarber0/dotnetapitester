@@ -34,6 +34,7 @@
     <Reference Include="Attachmate.Reflection, Version=1.2.0.0, Culture=neutral, PublicKeyToken=13bff1b6907eadcf, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files (x86)\Micro Focus\InfoConnect\Programmer Interfaces\Attachmate.Reflection.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Attachmate.Reflection.Emulation.OpenSystems, Version=1.2.0.0, Culture=neutral, PublicKeyToken=13bff1b6907eadcf, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -42,6 +43,7 @@
     <Reference Include="Attachmate.Reflection.Framework, Version=1.2.0.0, Culture=neutral, PublicKeyToken=13bff1b6907eadcf, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files (x86)\Micro Focus\InfoConnect\Programmer Interfaces\Attachmate.Reflection.Framework.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="clparser, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

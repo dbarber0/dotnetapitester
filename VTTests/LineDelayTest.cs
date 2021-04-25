@@ -28,11 +28,6 @@ namespace VTTests
             Console.WriteLine($"AutoConnect = {((IConnectionSettingsModem)_terminal.ConnectionSettings).LineDelay}");
         }
 
-        protected override void Command_Help(string[] CommandLine)
-        {
-
-        }
-
         private void SetTestName()
         {
             _testName = "LineDelay";

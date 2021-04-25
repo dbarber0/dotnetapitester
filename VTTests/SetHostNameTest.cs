@@ -21,13 +21,13 @@ namespace VTTests
             SetTestName();
 
             OptionDescriptor od = new OptionDescriptor(HostNameParser, null);
-            _parsers.Add("hn", od);
+            _options.Add("hn", od);
 
         }
 
         protected override void Command_Run(string[] CommandLine)
         {
-            ICLParser clparser = new Parser(_parsers);
+            ICLParser clparser = new Parser(_options);
             clparser.ParseCommandLine(CommandLine);
 
             Console.WriteLine($"Test '{_testName}' on emulation: {_emulation}\n");
@@ -48,6 +48,7 @@ namespace VTTests
             Console.WriteLine($"Updated Host Name = {((IConnectionSettingsTelnet)_terminal.ConnectionSettings).HostAddress}");
         }
 
+        /*
         protected override void Command_Help(string[] CommandLine)
         {
             Console.WriteLine("");
@@ -56,6 +57,7 @@ namespace VTTests
             Console.WriteLine(" USAGE:\t\tDotNetAPITest -e VT -s <SessionFile> -t SETHOSTNAME -hn <NewHostName>");
             Console.WriteLine("");
         }
+        */
 
         private void SetTestName()
         {

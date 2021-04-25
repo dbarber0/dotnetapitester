@@ -4,8 +4,17 @@ using Attachmate.Reflection.UserInterface;
 
 namespace IBMTests
 {
+    //  Obsolete
     public partial class IBMTestRunner
     {
+        protected void BIFFUITest()
+        {
+            /*
+            bool test = _terminal.FileTransfer.Xfr400SaveColumnHeader;
+            Console.WriteLine("ColumnHeader = {0}", test);
+            */
+        }
+
         protected void US200197()
         {
             if (_terminal != null)

@@ -30,8 +30,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Attachmate.Reflection, Version=1.2.0.0, Culture=neutral, PublicKeyToken=13bff1b6907eadcf, processorArchitecture=MSIL" />
-    <Reference Include="Attachmate.Reflection.Framework, Version=1.2.0.0, Culture=neutral, PublicKeyToken=13bff1b6907eadcf, processorArchitecture=MSIL" />
+    <Reference Include="Attachmate.Reflection, Version=1.2.0.0, Culture=neutral, PublicKeyToken=13bff1b6907eadcf, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Attachmate.Reflection.Framework, Version=1.2.0.0, Culture=neutral, PublicKeyToken=13bff1b6907eadcf, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
     <Reference Include="clparser, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\github\output\debug\clparser.dll</HintPath>
@@ -46,6 +50,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="TestRunner.cs" />
+    <Compile Include="TestRunnerBase.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -13,203 +13,105 @@ using VTTests;
 
 namespace DotNetAPITest
 {
-    public class App : IApp
+    public partial class App : IApp
     {
-        string _emulationType;
-        //private string[] _params;
-        //private string _command;
-        //private string[] _unprocessedParams;
+        private bool _basicHelpRequested;
+        private bool _dummy;
 
-        private readonly Dictionary<string, OptionDescriptor> _parsers;
-        private readonly Dictionary<string, CommandDescriptor> _commands;
-        //private int _optionCount;
-        //private OptionHelp _help;
-        protected readonly Dictionary<string, Type> _testRunnerFactories1;
+        string _emulationType;
+
+        private Dictionary<string, OptionDescriptor> _appOptions;
+        private Dictionary<string, CommandDescriptor> _commands;
+        protected Dictionary<string, Type> _testRunnerFactories;
 
 
         #region Construction
 
         public App()
         {
-            CommandDescriptor cd;
-            _parsers = new Dictionary<string, OptionDescriptor>();
-
-            OptionDescriptor od = new OptionDescriptor(EmulationParser, null);
-            _parsers.Add("e", od);
-
-            _commands = new Dictionary<string, CommandDescriptor>();
-            cd = new CommandDescriptor(HelpCommand, ShowHelp);
-            _commands.Add("help", cd);
-
-            cd = new CommandDescriptor(BasicHelpCommand, ShowHelp);
-            _commands.Add("?", cd);
-
-            cd = new CommandDescriptor(DummyCommand, null);
-            _commands.Add("dummy", cd);
-
-
-            cd = new CommandDescriptor(RunCommand, HelpOnCommand_Run);
-            _commands.Add("run", cd);
-
-            //cd = new CommandDescriptor(TestsCommand, HelpOnCommand_Tests);
-            //_commands.Add("tests", cd);
-
-            _testRunnerFactories1 = new Dictionary<string, Type>();
-            _testRunnerFactories1.Add("IBM", typeof(IBMTestRunner));
-            _testRunnerFactories1.Add("VT", typeof(VTTestRunner));
-            _testRunnerFactories1.Add("ALC", typeof(ALCTestRunner));
-            _testRunnerFactories1.Add("T27", typeof(T27TestRunner));
-            _testRunnerFactories1.Add("UTS", typeof(UTSTestRunner));
+            InitializeAppOptions();
+            InitializeCommands();
+            InitializeFactories();
         }
 
         #endregion Construction
 
         #region IApp
 
-        public void Run(string[] CommandLine)
+        public void RunApp(string[] CommandLine)
         {
             string command = string.Empty;
-            List<string> cl = null;
+            int commandLineParams = 0;
             try
             {
-                cl = CommandLine.ToList();
+                List<string> cl = CommandLine.ToList();
+                commandLineParams = cl.Count;
                 command = cl[0];
-                cl.RemoveAt(0);
+                if (!IsOption(command))
+                {
+                    cl.RemoveAt(0);
+                }
                 CommandLine = cl.ToArray();
-
-                Parser parser = new Parser(_parsers);
+                Parser parser = new Parser(_appOptions);
                 string[] unprocessedParams = parser.ParseCommandLine(CommandLine);
-
-                _commands[command].Command(unprocessedParams);
+                _commands[command.ToLower()].Command(unprocessedParams);
             }
             catch (ArgumentOutOfRangeException)
             {
-                ShowHelp();
+                //  Command line was empty, just show help
+                GeneralHelp();
             }
             catch
             {
-                Console.WriteLine($"\n Unknown Command '{command}'");
-                ShowHelp();
+                if (commandLineParams != 1 || !_basicHelpRequested)
+                {
+                    //  More than 1 CL param but we don't recognize the command, or only 1 and it wasn't '/?' so complain
+                    Console.WriteLine($"\n Unknown Command '{command}'");
+                }
+                GeneralHelp();
             }
         }
 
         #endregion IApp
 
+        void InitializeFactories()
+        {
+            _testRunnerFactories = new Dictionary<string, Type>();
+            _testRunnerFactories.Add("IBM", typeof(IBMTestRunner));
+            _testRunnerFactories.Add("VT", typeof(VTTestRunner));
+            _testRunnerFactories.Add("ALC", typeof(ALCTestRunner));
+            _testRunnerFactories.Add("T27", typeof(T27TestRunner));
+            _testRunnerFactories.Add("UTS", typeof(UTSTestRunner));
+        }
+
+        void InitializeCommands()
+        {
+            CommandDescriptor cd;
+            _commands = new Dictionary<string, CommandDescriptor>();
+
+            cd = new CommandDescriptor(Command_Run, HelpForCommand_Run);
+            _commands.Add("run", cd);
+
+            cd = new CommandDescriptor(Command_Help, HelpForCommand_Help);
+            _commands.Add("help", cd);
+
+            cd = new CommandDescriptor(Command_Tests, HelpForCommand_Tests);
+            _commands.Add("tests", cd);
+        }
+
+        void InitializeAppOptions()
+        {
+            _appOptions = new Dictionary<string, OptionDescriptor>();
+
+            OptionDescriptor od = new OptionDescriptor(EmulationParser, HelpForOption_Emulation);
+            _appOptions.Add("e", od);
+            od = new OptionDescriptor(DummyOptionParser, HelpForOption_Dummy);
+            _appOptions.Add("d", od);
+            od = new OptionDescriptor(BasicHelpParser, HelpForOption_BasicHelp);
+            _appOptions.Add("?", od);
+        }
+
         #region Parsers
-
-        void HelpCommand(string[] /*List<string>*/ CommandLine)
-        {
-            if (string.IsNullOrEmpty(_emulationType))
-            {
-                string command = string.Empty;
-                CommandDescriptor cd = null;
-                try
-                {
-                    command = CommandLine[0];
-                    _commands.TryGetValue(command, out cd);
-                    cd.Help();
-                }
-                catch (NullReferenceException)
-                {
-                    if (cd == null)
-                    {
-                        Console.WriteLine($"\n Unknown command '{command}'");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"\n No Help for command '{command}'");
-                    }
-                    ShowHelp();
-                }
-                catch /*(ArgumentOutOfRangeException)*/
-                {
-                    ShowHelp();
-                }
-            }
-            else
-            {
-                CommonCommand(Commands.Help, CommandLine);
-            }
-        }
-
-        void RunCommand(string[] /*List<string>*/ CommandLine)
-        {
-            CommonCommand(Commands.Run, CommandLine);
-        }
-
-        void BasicHelpCommand(string[] /*List<string>*/ CommandLine)
-        {
-            ShowHelp();
-        }
-
-        void DummyCommand(string[] /*List<string>*/ CommandLine)
-        {
-            Console.WriteLine("\n Ya big dummy!");
-        }
-
-        /*
-        void TestsCommand(List<string> CommandLine)
-        {
-            CommonCommand(Commands.Tests, CommandLine);
-        }
-
-        void DescribeCommand(List<string> CommandLine)
-        {
-            CommonCommand(Commands.Describe, CommandLine);
-        }
-        */
-
-        void ParseCommandLine()
-        {
-
-        }
-        void CommonCommand(Commands Command, string[] /*List<string>*/ CommandLine)
-        {
-            /*
-            Parser parser = new Parser(_parsers);
-            string[] unprocessedParams = parser.ParseCommandLine(CommandLine);
-            */
-
-            try
-            {
-                Type factory;
-                _testRunnerFactories1.TryGetValue(_emulationType, out factory);
-                TestRunner o = (TestRunner)Activator.CreateInstance(factory);
-                o.Run(Command, CommandLine);
-            }
-            catch (ArgumentNullException)
-            {
-                if (string.IsNullOrEmpty(_emulationType))
-                {
-                    Console.WriteLine("\n No emulation specified");
-                }
-                else
-                {
-                    Console.WriteLine($"\n Unknown emulation type: {_emulationType}");
-                }
-                ShowHelp();
-            }
-            catch
-            {
-                Console.WriteLine("DAB1");
-            }
-        }
-        void HelpOnCommand_Run()
-        {
-            Console.WriteLine("'Run' Command Help");
-        }
-
-        /*
-        void HelpOnCommand_Tests()
-        {
-            Console.WriteLine(" 'Tests' Command Help");
-        }
-
-        void HelpOnCommand_Describe()
-        {
-            Console.WriteLine(" 'Describe' Command Help");
-        }
-        */
 
         OptionParser EmulationParser(string Param)
         {
@@ -224,119 +126,128 @@ namespace DotNetAPITest
             }
 
             _emulationType = Param.ToUpper();
-            //_optionCount++;
+            return null;
+        }
+
+        OptionParser BasicHelpParser(string Param)
+        {
+            _basicHelpRequested = true;
+            return null;
+        }
+
+        OptionParser DummyOptionParser(string Param)
+        {
+            _dummy = true;
             return null;
         }
 
         #endregion Parsers
 
-        #region Help
+        #region Commands
 
-        private void ShowHelp()
+        void Command_Help(string[] CommandLine)
         {
-            Console.WriteLine("");
-            Console.WriteLine(" DESCRIPTION:\tExercise RIC Desktop's .NET API");
-            Console.WriteLine(" USAGE:\t\tDotNetAPITest command [<OptionSpec> ...], where:");
-            Console.WriteLine("");
-            Console.WriteLine("\t\tUnder Construction");
-            /*
-            Console.WriteLine("\t\tOptionSpec\t- <Flag><Option>[<Separator><Param>]");
-            Console.WriteLine("\t\tFlag\t\t- <'-' | '/'>");
-            Console.WriteLine("\t\tOption\t\t- Case-insensitive, see below");
-            Console.WriteLine("\t\tSeparator\t- <'=' | ' '>");
-            Console.WriteLine("\t\tParam\t\t- Case-insensitive");
-            Console.WriteLine("");
-            Console.WriteLine("\t\tOption/Param:");
-            Console.WriteLine("");
-            Console.WriteLine("\t\t?\t\t- Basic help, same as running with no options");
-            Console.WriteLine("\t\thelp\t\t");
-            Console.WriteLine("\t\thelp <Option>\t- Detailed help on <Option>");
-            Console.WriteLine("\t\te <Type>\t- Emulation Type, where <Type> is one of ALC, T27, UTS, IBM, VT");
-            Console.WriteLine("");
-            */
+            if (string.IsNullOrEmpty(_emulationType))
+            {
+                try
+                {
+                    string item = CommandLine[0];
+                    if (IsThereHelpForThisCommand(item))
+                    {
+                        return;
+                    }
+                    if (IsThereHelpForThisAppOption(item))
+                    {
+                        return;
+                    }
+                    if (IsThereHelpForThisCommonOption(item))
+                    {
+                        return;
+                    }
+                    Console.WriteLine($"\n No Help for item '{item}'");
+                }
+                catch
+                {
+                }
+                GeneralHelp();
+            }
+            else
+            {
+                Command_Common(Commands.Help, CommandLine);
+            }
         }
 
-
-        #endregion Help
-
-        #region DeleteMe
-
-        /*
-        bool HelpRequested()
+        void Command_Run(string[] CommandLine)
         {
-            if (_optionCount == 0)
+            if (_dummy)
             {
-                ShowHelp();
-                return true;
+                Console.Write("I'm sorry dave, I can't do that - HAL");
+                return;
             }
-            if (_help != null && _optionCount == 1)
+            Command_Common(Commands.Run, CommandLine);
+        }
+
+        void Command_Tests(string[] CommandLine)
+        {
+            Command_Common(Commands.Tests, CommandLine);
+        }
+
+        void Command_Dummy(string[] CommandLine)
+        {
+            Console.WriteLine("\n Ya big dummy!");
+        }
+
+        void Command_Common(Commands Command, string[] CommandLine)
+        {
+            try
             {
-                _help();
-                return true;
+                _testRunnerFactories.TryGetValue(_emulationType, out Type factory);
+                TestRunner o = (TestRunner)Activator.CreateInstance(factory);
+                o.RunCommand(Command, CommandLine);
+            }
+            catch (ArgumentNullException)
+            {
+                if (string.IsNullOrEmpty(_emulationType))
+                {
+                    Console.WriteLine("\n No emulation specified");
+                }
+                else
+                {
+                    Console.WriteLine($"\n Unknown emulation type: {_emulationType}");
+                }
+                GeneralHelp();
+            }
+            catch
+            {
+                Console.WriteLine("DAB1");
+            }
+        }
+
+        #endregion Commands
+
+        #region Helpers
+
+        bool IsOption(string Param)
+        {
+            try
+            {
+                if (Param[0] == CLParser.Options._optionFlag0[0] || Param[0] == CLParser.Options._optionFlag1[0])
+                {
+                    return true;
+                }
+            }
+            catch
+            {
+
             }
             return false;
         }
 
-        OptionParser BasicHelpParser(string Param)
-        {
-            _help = ShowHelp;
-            _optionCount++;
-            return null;
-        }
+        #endregion Helpers
 
-        private void HelpOnOption_Emulation()
-        {
-            Help.EmulationOption();
-        }
+        #region DeleteMe
 
-        OptionParser DetailedHelpParser(string Param)
-        {
-            if (string.IsNullOrEmpty(Param))
-            {
-                if (Param != null)
-                {
-                    return DetailedHelpParser;
-                }
-
-                _help = ShowHelp;
-                _optionCount++;
-                return null;
-            }
-
-            if (_parsers.ContainsKey(Param))
-            {
-                _parsers.TryGetValue(Param, out OptionDescriptor od);
-                _help = od?.Help;
-            }
-            else
-            {
-                Console.WriteLine($"No Help found for option {Param}");
-                _help = ShowHelp;
-            }
-
-            _optionCount++;
-            return null;
-        }
-
-
-        
-        
-            ICLParser clparser = new Parser(_parsers);
-            string[] unprocessedParams = clparser.ParseCommandLine(_params);
-
-            if (HelpRequested())
-            {
-                return;
-            }
-
-            Type factory;
-            if (!_testRunnerFactories1.TryGetValue(_emulationType, out factory))
-            {
-                Console.WriteLine($"Unknown emulation type: {_emulationType}");
-                return;
-            }
-            TestRunner o = (TestRunner)Activator.CreateInstance(factory);
-            o.Run(unprocessedParams);
+        /*
         */
 
         #endregion

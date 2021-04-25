@@ -125,7 +125,7 @@ namespace VTTests
         protected void RunTest()
         {
             Test o = (Test)Activator.CreateInstance(_testType, new object[] { _terminal, _emulationType });
-            o.Run(Commands.Run, _unprocessedParams);
+            o.RunCommand(Commands.Run, _unprocessedParams);
         }
 
 
