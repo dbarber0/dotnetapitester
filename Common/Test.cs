@@ -88,7 +88,19 @@ namespace Common
         protected void Pause(string Message)
         {
             Console.WriteLine(Message);
+            Console.WriteLine("Hit 'Enter' to continue");
             Console.ReadLine();
+        }
+
+        protected void DisplayTestInfo()
+        {
+            Console.WriteLine($"Test '{_testName}' on emulation: {_emulation}");
+        }
+
+        protected string ReadLine(string Text)
+        {
+            Console.Write(Text);
+            return Console.ReadLine();
         }
     }
 

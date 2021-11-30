@@ -49,11 +49,11 @@ namespace UTSTests
         {
             Console.WriteLine($"\n Generic Help - Consider creating help for {_testName}");
         }
-        */
 
         protected override void HelpOnTest()
         {
             Console.WriteLine($"Help for {_testName} under construction");
         }
+        */
     }
 }

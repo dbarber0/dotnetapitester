@@ -12,7 +12,7 @@ namespace DotNetAPITest
             //  Not Major, not Captain, General
             Console.WriteLine("");
             Console.WriteLine(" DESCRIPTION:\tExercise RIC Desktop's .NET API");
-            Console.WriteLine(" USAGE:\t\tDotNetAPITest command [Item ...], where:");
+            Console.WriteLine(" USAGE:\t\tDotNetAPITest Command [Item ...], where:");
             Console.WriteLine("");
             Console.WriteLine(" Command:");
             ListCommands();

@@ -71,25 +71,7 @@ namespace UTSTests
         #region DeleteMe
 
         /*
-        void US199046()
-        {
-            Console.WriteLine("UTS");
-            var temp = _screen.CursorFollowsSelection;
-            Console.WriteLine("\nCursorFollowsSelection = {0}", temp);
-            _screen.AutoCopyOnSelect = !temp;
-            Console.WriteLine("CursorFollowsSelection = {0}", _screen.AutoCopyOnSelect);
-            _screen.AutoCopyOnSelect = temp;
-            Console.WriteLine("CursorFollowsSelection = {0}", _screen.AutoCopyOnSelect);
-
-            temp = _screen.StripTrailingBlankLines;
-            Console.WriteLine("\nStripTrailingBlankLines = {0}", temp);
-            _screen.AutoCopyOnSelect = !temp;
-            Console.WriteLine("StripTrailingBlankLines = {0}", _screen.AutoCopyOnSelect);
-            _screen.AutoCopyOnSelect = temp;
-            Console.WriteLine("StripTrailingBlankLines = {0}", _screen.AutoCopyOnSelect);
-        }
-
-       */
+        */
         #endregion
     }
 }

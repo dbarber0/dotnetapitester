@@ -344,39 +344,6 @@ namespace Common
         #region DeleteMe
 
         /*
-        protected void UpdateCursor(int L)
-        {
-            int r;
-            int c;
-            int nsp = RowColumnToScreenPosition(CursorRow, CursorColumn) + L;
-            ScreenPositionToRowColumn(nsp, out r, out c);
-            CursorRow = r;
-            CursorColumn = c;
-        }
-
-        protected int RowColumnToScreenPosition(int R, int C)
-        {
-            return ((R - 1) * Columns) + C;
-        }
-
-        protected void ScreenPositionToRowColumn(int SP, out int R, out int C)
-        {
-            if (SP > Rows * Columns)
-            {
-                R = Rows;
-                C = Columns;
-                return;
-            }
-            if (SP < 1)
-            {
-                R = 1;
-                C = 1;
-                return;
-            }
-            R = (SP / Columns) + 1;
-            C = (SP % Columns);
-        }
-
         */
 
         #endregion

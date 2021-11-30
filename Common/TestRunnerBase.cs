@@ -11,6 +11,7 @@ namespace Common
         protected string _testName;
 
         protected Dictionary<string, OptionDescriptor> _commonOptions;
+
         public TestRunnerBase()
         {
             InitializeCommonOptions();

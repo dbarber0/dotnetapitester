@@ -17,6 +17,7 @@ namespace VTTests
             _tests.Add("AutoConnectProperty".ToUpper(), typeof(AutoConnectPropertyTest));
             _tests.Add("LineDelayProperty".ToUpper(), typeof(LineDelayTest));
             _tests.Add("TimeoutProperty".ToUpper(), typeof(TimeoutTest));
+            _tests.Add("D367102".ToUpper(), typeof(D367102));
         }
 
         protected override void RunInternal()

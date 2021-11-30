@@ -15,6 +15,8 @@ namespace IBMTests
             _emulationType = "IBM";
 
             _tests.Add("BIFFUITest".ToUpper(), typeof(BIFFUITest));
+            _tests.Add("D246006".ToUpper(), typeof(D246006));
+            _tests.Add("D321084".ToUpper(), typeof(D321084));
         }
 
         #region ITest
