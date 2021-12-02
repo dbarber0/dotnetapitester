@@ -9,29 +9,21 @@ namespace DotNetAPITest
     {
         private void GeneralHelp()
         {
-            //  Not Major, not Captain, General
             Console.WriteLine("");
             Console.WriteLine(" DESCRIPTION:\tExercise RIC Desktop's .NET API");
             Console.WriteLine(" USAGE:\t\tDotNetAPITest Command [Item ...], where:");
             Console.WriteLine("");
-            Console.WriteLine(" Command:");
+            Console.WriteLine(" Commands:");
             ListCommands();
             Console.WriteLine("");
-            Console.WriteLine(" OptionSpec: <Flag><Option>[<Separator><Param>]");
-            Console.WriteLine("\tFlag\t\t- <'-' | '/'>");
-            Console.WriteLine("\tOption\t\t- Case-insensitive, see below");
-            Console.WriteLine("\tSeparator\t- <'=' | ' '>");
-            Console.WriteLine("\tParam\t\t- Case-insensitive");
-            Console.WriteLine("");
-            Console.WriteLine(" Option:");
+            Console.WriteLine(" Options:");
             ListOptions();
-            //Console.WriteLine("\ts <SessionFile>\t- Session file to use. Must specify an emulation with /e <Type>");
             Console.WriteLine("");
-            Console.WriteLine(" HelpItem:");
-            Console.WriteLine("\tAn option or command");
+            Console.WriteLine("   Run 'DotNetAPITest help optionspec' for details on passing options");
             Console.WriteLine("");
-            Console.WriteLine(" e.g., DotNetAPITest run /e ALC /s session.ialc /t 123456");
-            Console.WriteLine("       DotNetAPITest help run");
+            Console.WriteLine(" Examples:");
+            Console.WriteLine("   DotNetAPITest run /e ALC /s session.ialc /t 123456");
+            Console.WriteLine("   DotNetAPITest help run");
             Console.WriteLine("");
         }
 
@@ -51,6 +43,7 @@ namespace DotNetAPITest
                 }
             }
 
+            //  Include options that are maintained in the base TestRunner class
             TestRunnerBase trb = new TestRunnerBase();
             trb.ListCommonOptions();
         }
@@ -77,31 +70,66 @@ namespace DotNetAPITest
         {
             if (Type == HelpType.Detailed)
             {
-                Console.WriteLine("Detailed help on command 'Run' under construction");
-                return;
+                Console.WriteLine("");
+                Console.WriteLine(" DESCRIPTION:\tRun a test for a specified emulation and session");
+                Console.WriteLine(" USAGE:\t\tDotNetAPITest run -e <EmuType> -s <Session> /t <test> [<TestOption> ...]");
+                Console.WriteLine("");
+                Console.WriteLine(" EXAMPLE:\tDotNetAPITest run -e IBM -s session1.rd3x -t SomeIBMTest");
+                Console.WriteLine("");
+                Console.WriteLine("\t\tRun DotNetAPITest help -e for help on Emulation Types");
+                Console.WriteLine("\t\tRun DotNetAPITest tests -e <EmuType> for a list of available tests for <EmuType>");
+                Console.WriteLine("\t\tRun DotNetAPITest help -e <EmuType> /t <Test> for help on a specific Test, including options");
             }
-            Console.WriteLine("\tRun <EmuOption> <TestOption> [<OptionSpec> ...]\t- Run a command/test specific to an emulation");
+            else
+            {
+                Console.WriteLine("   Run <EmuType> <Session> <Test> [<TestOption> ...]\t- Run a command/test specific to an emulation");
+                Console.WriteLine("\t\t\t\t\t\t\t  using the specified session file");
+            }
         }
 
         void HelpForCommand_Tests(HelpType Type, string Command)
         {
             if (Type == HelpType.Detailed)
             {
-                Console.WriteLine("Detailed help on command 'Tests' under construction");
-                return;
+                Console.WriteLine("");
+                Console.WriteLine(" DESCRIPTION:\tList Tests available for an emulation");
+                Console.WriteLine(" USAGE:\t\tDotNetAPITest tests -e <EmuType>");
+                Console.WriteLine("");
+                Console.WriteLine(" EXAMPLE:\tDotNetAPITest tests -e IBM");
+                Console.WriteLine("");
+                Console.WriteLine("\t\tRun DotNetAPITest help -e for help on Emulation Types");
+                Console.WriteLine("\t\tRun DotNetAPITest help -e <EmuType> /t <Test> for help on a specific Test, including options");
             }
-            Console.WriteLine("\tTests <EmuOption>\t\t\t\t- List tests available for a specific emulation");
+            else
+            {
+                Console.WriteLine("   Tests <EmuType>\t\t\t\t\t- List tests available for a specific emulation");
+            }
         }
 
         void HelpForCommand_Help(HelpType Type, string Command)
         {
             if (Type == HelpType.Detailed)
             {
-                Console.WriteLine("Detailed help on command 'Help' under construction");
-                return;
+                GeneralHelp();
             }
-            Console.WriteLine("\tHelp [<Command> | <Option>]\t\t\t- Without an optional parameter, general Help");
-            Console.WriteLine("\t\t\t\t\t\t\t  otherwise, help on a specific command or option");
+            else
+            {
+                Console.WriteLine("   Help [<Command> | <Option>]\t\t\t\t- Without an optional parameter, this Help");
+                Console.WriteLine("\t\t\t\t\t\t\t  otherwise, help on a specific command or option");
+            }
+        }
+
+        void HelpForCommand_Dummy(HelpType Type, string Command)
+        {
+            if (Type == HelpType.Detailed)
+            {
+                Console.WriteLine("");
+                Console.WriteLine(" Really, you need help doing something dumb?");
+            }
+            else
+            {
+                Console.WriteLine("   Dummy\t\t\t\t\t\t- Do something dumb");
+            }
         }
 
         #endregion
@@ -113,37 +141,26 @@ namespace DotNetAPITest
             if (Help == HelpType.Detailed)
             {
                 Console.WriteLine("");
-                Console.WriteLine(
-                    " DESCRIPTION:\tFor a specified emulation type, run tests, display type-specific help, etc.");
-                Console.WriteLine(" USAGE:\t\tDotNetAPITest run -e <Type> [<OptionSpec> ...], where:");
+                Console.WriteLine(" DESCRIPTION:\tSpecify the emulation type for a command");
+                Console.WriteLine(" USAGE:\t\tDotNetAPITest <Command> -e <EmuType> [<Option> ...], where:");
                 Console.WriteLine("");
-                Console.WriteLine("\t\t<Type>\t\t- One of ALC, T27, UTS, IBM, VT");
-                Console.WriteLine("\t\t\t\t  With neither <EmuOptionSpec>[s] nor -emuhelp");
-                Console.WriteLine("\t\t\t\t  specified, shows basic help for <Type>");
-                Console.WriteLine("\t\tOptionSpec\t- <Flag><Option>[<Separator><Param>]");
-                Console.WriteLine("\t\t\t\t  Run 'DotNetAPITest -?' for details on 'OptionSpec'");
-                Console.WriteLine("\t\tOption\t\t- An option specific to <Type>");
+                Console.WriteLine("\t\tCommand\t- The command to run using emulation type <EmuType>");
+                Console.WriteLine("\t\tEmuType\t- One of ALC, T27, UTS, IBM, VT");
+                Console.WriteLine("\t\tOption\t- An option for the test");
                 Console.WriteLine("");
-                Console.WriteLine("\t\te.g.:");
+                Console.WriteLine("\t\tRun 'DotNetAPITest help' for available commands");
+                Console.WriteLine("\t\tRun 'DotNetAPITest help /e <EmuType>' for options/tests specific to an <EmuType>");
+                Console.WriteLine("\t\tRun 'DotNetAPITest help optionspec' for details on passing options");
                 Console.WriteLine("");
-                Console.WriteLine("\t\tDotNetAPITest run -e ALC\t\t- Basic help for ALC");
-                Console.WriteLine("\t\tDotNetAPITest run -e ALC -t <SomeTest>");
+                Console.WriteLine(" Examples:");
+                Console.WriteLine("   DotNetAPITest help -e ALC\t\t\t\t\t- Basic help for ALC");
+                Console.WriteLine("   DotNetAPITest run -e UTS /s=session1.iuts -t SomeTest\t- Run 'SomeTest' using a UTS session");
                 Console.WriteLine("");
             }
             else
             {
-                Console.WriteLine("\te <Type>\t- Emulation Type, where <Type> is one of ALC, T27, UTS, IBM, VT");
+                Console.WriteLine("   e <EmuType>\t\t- Emulation Type, where <EmuType> is one of ALC, T27, UTS, IBM, VT");
             }
-        }
-
-        void HelpForOption_BasicHelp(HelpType Type, string Command)
-        {
-            if (Type == HelpType.Detailed)
-            {
-                Console.WriteLine("Detailed help on command '?' under construction");
-                return;
-            }
-            Console.WriteLine("\t?\t\t- Solo, general Help, otherwise ignored");
         }
 
         public void HelpForOption_Dummy(HelpType Help, string Option)
@@ -151,19 +168,47 @@ namespace DotNetAPITest
             if (Help == HelpType.Detailed)
             {
                 Console.WriteLine("");
-                Console.WriteLine(" DESCRIPTION:\tTest Dummy option");
-                Console.WriteLine(" USAGE:\t\tDotNetAPITest run -d");
+                Console.WriteLine(" DESCRIPTION:\tModify the dummy command");
+                Console.WriteLine(" USAGE:\t\tDotNetAPITest dummy -d");
                 Console.WriteLine("");
                 return;
             }
-            Console.WriteLine("\td\t\t- Do something dumb");
+            Console.WriteLine("   d\t\t\t- When being a dummy, be a really big one");
         }
 
         #endregion App Options Help
 
+        void MiscHelp_OptionSpec()
+        {
+            Console.WriteLine("");
+            Console.WriteLine(" OptionSpec: <Flag><Option>[<Separator><Param>]");
+            Console.WriteLine("   Flag\t\t- <'-' | '/'>");
+            Console.WriteLine("   Option\t- Case-insensitive, see below");
+            Console.WriteLine("   Separator\t- <'=' | ' '>");
+            Console.WriteLine("   Param\t- Case-insensitive");
+            Console.WriteLine("");
+            Console.WriteLine(" Examples:");
+            Console.WriteLine("   /e ALC");
+            Console.WriteLine("   -s=session1.iuts");
+        }
+
         #region Helpers
 
-        bool IsThereHelpForThisCommonOption(string item)
+        bool ShowHelpForThisMiscHelpItem(string Item)
+        {
+            try
+            {
+                _miscHelpItems.TryGetValue(Item.ToLower(), out D help);
+                help();
+                return true;
+            }
+            catch (NullReferenceException)
+            {
+            }
+            return false;
+        }
+
+        bool ShowHelpForThisCommonOption(string item)
         {
             TestRunnerBase b = new TestRunnerBase();
             if (b.HelpOnOption(item))
@@ -173,7 +218,7 @@ namespace DotNetAPITest
             return false;
         }
 
-        bool IsThereHelpForThisAppOption(string Option)
+        bool ShowHelpForThisAppOption(string Option)
         {
             try
             {
@@ -187,7 +232,7 @@ namespace DotNetAPITest
             return false;
         }
 
-        bool IsThereHelpForThisCommand(string Command)
+        bool ShowHelpForThisCommand(string Command)
         {
             try
             {

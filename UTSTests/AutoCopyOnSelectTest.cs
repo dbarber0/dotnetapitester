@@ -44,16 +44,12 @@ namespace UTSTests
             Console.WriteLine("StripTrailingBlankLines = {0}", _screen.StripTrailingBlankLines);
         }
 
-        /*
-        protected override void Command_Help(string[] CommandLine)
-        {
-            Console.WriteLine($"\n Generic Help - Consider creating help for {_testName}");
-        }
-
         protected override void HelpOnTest()
         {
-            Console.WriteLine($"Help for {_testName} under construction");
+            Console.WriteLine("");
+            Console.WriteLine(" DESCRIPTION:\tTest the Screen object methods AutoCopyOnSelect and StripTrailingBlankLines");
+            Console.WriteLine(" USAGE:\t\tDotNetAPITest run -e UTS /s <SessionFile> /t autocopyonselect");
+            Console.WriteLine("");
         }
-        */
     }
 }

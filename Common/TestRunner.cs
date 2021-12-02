@@ -91,12 +91,12 @@ namespace Common
                 try
                 {
                     item = CommandLine[0];
-                    if (IsThereHelpForThisOption(item))
+                    if (ShowHelpForThisOption(item))
                     {
                         return;
                     }
                     Console.WriteLine($"\n {_emulationType} Tests: No Help for item '{item}'");
-                    ShowHelp();
+                    Console.WriteLine($" If {item} is a test, rerun the command and add '/t {item}'");
                 }
                 catch
                 {
@@ -191,7 +191,7 @@ namespace Common
 
         #region Private Helpers
 
-        private bool IsThereHelpForThisOption(string Option)
+        private bool ShowHelpForThisOption(string Option)
         {
             try
             {
@@ -280,15 +280,14 @@ namespace Common
             return md + @"Micro Focus" + Path.DirectorySeparatorChar;
         }
 
-        private void ListTests()
+        protected void ListTests()
         {
             Console.WriteLine("");
             Console.WriteLine($" Available tests for emulation type {_emulationType}:");
-            Console.WriteLine("");
 
             foreach (var test in _tests)
             {
-                Console.WriteLine($"\t{test.Key}");
+                Console.WriteLine($"   {test.Key}");
             }
             Console.WriteLine("");
         }
@@ -321,7 +320,13 @@ namespace Common
 
         protected virtual void ShowHelp()
         {
-            Console.WriteLine($"\n Generic Help - consider creating help for {_emulationType}");
+            Console.WriteLine("");
+            Console.WriteLine($" DESCRIPTION:\tDo 'things' specific to {_emulationType} sessions");
+            Console.WriteLine("");
+            Console.WriteLine(" Examples:");
+            Console.WriteLine($"   DotNetAPITest run -e {_emulationType} -s <SessionFile> -t <SomeTest>\t- Run <SomeTest> using <SessionFile>");
+            Console.WriteLine($"   DotNetAPITest help -e {_emulationType} -t <SomeTest>\t\t\t- Show Help for <SomeTest>");
+            ListTests();
         }
 
         protected virtual void PutText(string Data, int Row, int Column)

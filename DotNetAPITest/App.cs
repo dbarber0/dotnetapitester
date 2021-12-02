@@ -15,7 +15,8 @@ namespace DotNetAPITest
 {
     public partial class App : IApp
     {
-        private bool _basicHelpRequested;
+        delegate void D();
+
         private bool _dummy;
 
         string _emulationType;
@@ -23,7 +24,7 @@ namespace DotNetAPITest
         private Dictionary<string, OptionDescriptor> _appOptions;
         private Dictionary<string, CommandDescriptor> _commands;
         protected Dictionary<string, Type> _testRunnerFactories;
-
+        private Dictionary<string, D> _miscHelpItems;
 
         #region Construction
 
@@ -31,6 +32,7 @@ namespace DotNetAPITest
         {
             InitializeAppOptions();
             InitializeCommands();
+            InitilaizeMiscHelpOptions();
             InitializeFactories();
         }
 
@@ -47,10 +49,11 @@ namespace DotNetAPITest
                 List<string> cl = CommandLine.ToList();
                 commandLineParams = cl.Count;
                 command = cl[0];
-                if (!IsOption(command))
-                {
-                    cl.RemoveAt(0);
-                }
+                cl.RemoveAt(0);
+                //if (!IsOption(command))
+                //{
+                //    cl.RemoveAt(0);
+                //}
                 CommandLine = cl.ToArray();
                 Parser parser = new Parser(_appOptions);
                 string[] unprocessedParams = parser.ParseCommandLine(CommandLine);
@@ -63,11 +66,8 @@ namespace DotNetAPITest
             }
             catch
             {
-                if (commandLineParams != 1 || !_basicHelpRequested)
-                {
-                    //  More than 1 CL param but we don't recognize the command, or only 1 and it wasn't '/?' so complain
-                    Console.WriteLine($"\n Unknown Command '{command}'");
-                }
+                //  Don't recognize the command
+                Console.WriteLine($"\n Unknown Command '{command}'");
                 GeneralHelp();
             }
         }
@@ -97,6 +97,9 @@ namespace DotNetAPITest
 
             cd = new CommandDescriptor(Command_Tests, HelpForCommand_Tests);
             _commands.Add("tests", cd);
+
+            cd = new CommandDescriptor(Command_Dummy, HelpForCommand_Dummy);
+            _commands.Add("dummy", cd);
         }
 
         void InitializeAppOptions()
@@ -107,8 +110,13 @@ namespace DotNetAPITest
             _appOptions.Add("e", od);
             od = new OptionDescriptor(DummyOptionParser, HelpForOption_Dummy);
             _appOptions.Add("d", od);
-            od = new OptionDescriptor(BasicHelpParser, HelpForOption_BasicHelp);
-            _appOptions.Add("?", od);
+        }
+
+        void InitilaizeMiscHelpOptions()
+        {
+            _miscHelpItems = new Dictionary<string, D>();
+
+            _miscHelpItems.Add("optionspec", MiscHelp_OptionSpec);
         }
 
         #region Parsers
@@ -129,12 +137,6 @@ namespace DotNetAPITest
             return null;
         }
 
-        OptionParser BasicHelpParser(string Param)
-        {
-            _basicHelpRequested = true;
-            return null;
-        }
-
         OptionParser DummyOptionParser(string Param)
         {
             _dummy = true;
@@ -149,27 +151,38 @@ namespace DotNetAPITest
         {
             if (string.IsNullOrEmpty(_emulationType))
             {
+                bool showGeneralHelp = true;
                 try
                 {
                     string item = CommandLine[0];
-                    if (IsThereHelpForThisCommand(item))
+                    if (ShowHelpForThisCommand(item))
                     {
-                        return;
+                        showGeneralHelp = false;
                     }
-                    if (IsThereHelpForThisAppOption(item))
+                    else if (ShowHelpForThisAppOption(item))
                     {
-                        return;
+                        showGeneralHelp = false;
                     }
-                    if (IsThereHelpForThisCommonOption(item))
+                    else if (ShowHelpForThisCommonOption(item))
                     {
-                        return;
+                        showGeneralHelp = false;
                     }
-                    Console.WriteLine($"\n No Help for item '{item}'");
+                    else if (ShowHelpForThisMiscHelpItem(item))
+                    {
+                        showGeneralHelp = false;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"\n No Help for item '{item}'");
+                    }
                 }
                 catch
                 {
                 }
-                GeneralHelp();
+                if(showGeneralHelp)
+                {
+                    GeneralHelp();
+                }
             }
             else
             {
@@ -181,7 +194,7 @@ namespace DotNetAPITest
         {
             if (_dummy)
             {
-                Console.Write("I'm sorry dave, I can't do that - HAL");
+                Console.Write("I'm sorry Dave, I can't do that - HAL");
                 return;
             }
             Command_Common(Commands.Run, CommandLine);
@@ -194,7 +207,14 @@ namespace DotNetAPITest
 
         void Command_Dummy(string[] CommandLine)
         {
-            Console.WriteLine("\n Ya big dummy!");
+            if(_dummy)
+            {
+                Console.WriteLine("\n Ya really big dummy!");
+            }
+            else
+            {
+                Console.WriteLine("\n Ya dummy!");
+            }
         }
 
         void Command_Common(Commands Command, string[] CommandLine)
@@ -225,30 +245,7 @@ namespace DotNetAPITest
 
         #endregion Commands
 
-        #region Helpers
-
-        bool IsOption(string Param)
-        {
-            try
-            {
-                if (Param[0] == CLParser.Options._optionFlag0[0] || Param[0] == CLParser.Options._optionFlag1[0])
-                {
-                    return true;
-                }
-            }
-            catch
-            {
-
-            }
-            return false;
-        }
-
-        #endregion Helpers
-
         #region DeleteMe
-
-        /*
-        */
 
         #endregion
     }

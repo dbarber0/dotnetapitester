@@ -61,16 +61,18 @@ namespace UTSTests
 
         #region Help
 
-        protected override void ShowHelp()
-        {
-            Console.WriteLine("\n UTSTestRunner help");
-        }
-
         #endregion Help
 
         #region DeleteMe
 
         /*
+        protected override void ShowHelp()
+        {
+            Console.WriteLine("");
+            Console.WriteLine($" DESCRIPTION:\tDo 'things' specific to {_emulationType} sessions");
+            ListTests();
+        }
+
         */
         #endregion
     }
