@@ -82,8 +82,8 @@ namespace DotNetAPITest
             }
             else
             {
-                Console.WriteLine("   Run <EmuType> <Session> <Test> [<TestOption> ...]\t- Run a command/test specific to an emulation");
-                Console.WriteLine("\t\t\t\t\t\t\t  using the specified session file");
+                Console.WriteLine("   Run -e <EmuType> -s <Session> -t <Test> [<TestOption> ...]\t- Run a command/test specific to an emulation");
+                Console.WriteLine("\t\t\t\t\t\t\t\t  using the specified session file");
             }
         }
 
@@ -102,7 +102,7 @@ namespace DotNetAPITest
             }
             else
             {
-                Console.WriteLine("   Tests <EmuType>\t\t\t\t\t- List tests available for a specific emulation");
+                Console.WriteLine("   Tests -e <EmuType>\t\t\t\t\t\t- List tests available for a specific emulation");
             }
         }
 
@@ -114,8 +114,8 @@ namespace DotNetAPITest
             }
             else
             {
-                Console.WriteLine("   Help [<Command> | <Option>]\t\t\t\t- Without an optional parameter, this Help");
-                Console.WriteLine("\t\t\t\t\t\t\t  otherwise, help on a specific command or option");
+                Console.WriteLine("   Help [<Command> | <Option>]\t\t\t\t\t- Without an optional parameter, this Help");
+                Console.WriteLine("\t\t\t\t\t\t\t\t  otherwise, help on a specific command or option");
             }
         }
 
@@ -128,7 +128,7 @@ namespace DotNetAPITest
             }
             else
             {
-                Console.WriteLine("   Dummy\t\t\t\t\t\t- Do something dumb");
+                Console.WriteLine("   Dummy\t\t\t\t\t\t\t- Do something dumb");
             }
         }
 
